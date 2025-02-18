@@ -1,0 +1,28 @@
+name: Repro
+on:
+  push:
+    branches: [master]
+jobs:
+  j:
+    name: Reproduce bug
+    runs-on: windows-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: VC Vars
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: "14.38.33130"
+      - name: Configure
+        run: cmake -B build -S .
+      - name: Build
+        run: cmake --build build --config Debug
+      - name: No align
+        run: cmake --build . --config Debug --target run-no-align-no-repro
+      - name: No heap alloc
+        run: cmake --build . --config Debug --target run-no-heap-alloc-no-repro
+      - name: No deduce
+        run: cmake --build . --config Debug --target run-no-deduce-no-repro
+      - name: Repro
+        run: cmake --build . --config Debug --target run-repro
